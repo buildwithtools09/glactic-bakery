@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galactic Bakery</title>
+    <style>
+        :root {
+            --primary: #ff6b6b;
+            --secondary: #4ecdc4;
+            --dark: #292f36;
+            --light: #f7fff7;
+            --accent: #ff9f1c;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .main-game {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .cookie-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .cookie-count {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        .cps-display {
+            font-size: 1rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+        
+        .cookie-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cookie-button:active {
+            transform: scale(0.95);
+        }
+        
+        .cookie-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .click-effect {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float-up 1s forwards;
+        }
+        
+        @keyframes float-up {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) scale(0);
+                opacity: 0;
+            }
+        }
+        
+        .upgrades-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--secondary);
+        }
+        
+        .upgrades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 10px;
+        }
+        
+        .upgrade {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        
+        .upgrade:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .upgrade-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .upgrade-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .upgrade-level {
+            color: var(--secondary);
+        }
+        
+        .upgrade-description {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .upgrade-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .upgrade-cost {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .buy-button {
+            background-color: var(--secondary);
+            color: var(--dark);
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        
+        .buy-button:hover {
+            background-color: #3dbeb6;
+        }
+        
+        .buy-button:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+        }
+        
+        .prestige-section {
+            background-color: rgba(78, 205, 196, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .prestige-button {
+            background-color: var(--accent);
+            color: var(--dark);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+        
+        .prestige-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .prestige-button:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--secondary);
+            color: var(--dark);
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transform: translateX(200%);
+            transition: transform 0.3s;
+            z-index: 100;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        @media (max-width: 768px) {
+            .upgrades-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cookie-button {
+                width: 150px;
+                height: 150px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .cookie-count {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* Animation for cookie particles */
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .cookie-particle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 2s forwards;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Galactic Bakery</h1>
+        <p>Bake cookies, hire bakers, and dominate the galaxy with your cookie empire!</p>
+    </header>
+    
+    <div class="game-container">
+        <div class="main-game">
+            <div class="cookie-display">
+                <div class="cookie-count">0 cookies</div>
+                <div class="cps-display">0 cookies per second</div>
+                <button class="cookie-button" id="cookie">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png" alt="Cookie">
+                </button>
+            </div>
+            
+            <div class="upgrades-section">
+                <h2 class="section-title">Bakers</h2>
+                <div class="upgrades-grid" id="generators">
+                    <!-- Generators will be added here by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="upgrades-section">
+                <h2 class="section-title">Upgrades</h2>
+                <div class="upgrades-grid" id="upgrades">
+                    <!-- Upgrades will be added here by JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="prestige-section">
+            <h2 class="section-title">Prestige</h2>
+            <p>Reset your game to gain prestige points and permanent bonuses!</p>
+            <p id="prestige-info">You have 0 prestige points (+0% bonus)</p>
+            <button class="prestige-button" id="prestige" disabled>Prestige (0 cookies needed)</button>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <script>
+        // Game state
+        const game = {
+            cookies: 0,
+            totalCookies: 0,
+            cookiesPerSecond: 0,
+            prestigePoints: 0,
+            lastUpdate: Date.now(),
+            
+            generators: [
+                { id: 1, name: "Grandma", baseCost: 10, baseCps: 0.1, owned: 0, description: "A nice grandma to bake cookies for you." },
+                { id: 2, name: "Farm", baseCost: 100, baseCps: 1, owned: 0, description: "Grows cookie plants in vast fields." },
+                { id: 3, name: "Mine", baseCost: 1100, baseCps: 8, owned: 0, description: "Mines cookie dough from the earth." },
+                { id: 4, name: "Factory", baseCost: 12000, baseCps: 47, owned: 0, description: "Mass produces cookies with machines." },
+                { id: 5, name: "Bank", baseCost: 130000, baseCps: 260, owned: 0, description: "Invests in cookie futures." },
+                { id: 6, name: "Temple", baseCost: 1400000, baseCps: 1400, owned: 0, description: "Prays for cookie miracles." },
+                { id: 7, name: "Wizard Tower", baseCost: 20000000, baseCps: 7800, owned: 0, description: "Magically conjures cookies." },
+                { id: 8, name: "Shipment", baseCost: 330000000, baseCps: 44000, owned: 0, description: "Imports cookies from space." },
+                { id: 9, name: "Alchemy Lab", baseCost: 5100000000, baseCps: 260000, owned: 0, description: "Turns gold into cookies." },
+                { id: 10, name: "Portal", baseCost: 75000000000, baseCps: 1600000, owned: 0, description: "Summons cookies from other dimensions." }
+            ],
+            
+            upgrades: [
+                { id: 1, name: "Reinforced Oven", cost: 100, description: "Grandmas are twice as efficient.", generatorId: 1, multiplier: 2, purchased: false },
+                { id: 2, name: "Fertilizer", cost: 500, description: "Farms produce twice as many cookies.", generatorId: 2, multiplier: 2, purchased: false },
+                { id: 3, name: "Sugar Geodes", cost: 3000, description: "Mines produce twice as many cookies.", generatorId: 3, multiplier: 2, purchased: false },
+                { id: 4, name: "Sturdier Conveyors", cost: 10000, description: "Factories are twice as efficient.", generatorId: 4, multiplier: 2, purchased: false },
+                { id: 5, name: "Better Interest", cost: 40000, description: "Banks produce twice as many cookies.", generatorId: 5, multiplier: 2, purchased: false },
+                { id: 6, name: "Golden Idols", cost: 200000, description: "Temples are twice as efficient.", generatorId: 6, multiplier: 2, purchased: false },
+                { id: 7, name: "Conjuring Tricks", cost: 1666666, description: "Wizard towers produce twice as many cookies.", generatorId: 7, multiplier: 2, purchased: false },
+                { id: 8, name: "Galactic Trade Routes", cost: 123456789, description: "Shipments are twice as efficient.", generatorId: 8, multiplier: 2, purchased: false },
+                { id: 9, name: "Ambrosia", cost: 3999999999, description: "Alchemy labs produce twice as many cookies.", generatorId: 9, multiplier: 2, purchased: false },
+                { id: 10, name: "Eldritch Pact", cost: 75000000000, description: "Portals are twice as efficient.", generatorId: 10, multiplier: 2, purchased: false },
+                { id: 11, name: "Cookie Clicker", cost: 500, description: "Clicking the cookie gives 2x as many cookies.", generatorId: 0, multiplier: 2, purchased: false },
+                { id: 12, name: "Lucky Day", cost: 10000, description: "All buildings are 1.5x as efficient.", generatorId: -1, multiplier: 1.5, purchased: false }
+            ],
+            
+            // Calculate the cost of a generator based on how many are owned
+            getGeneratorCost(generator) {
+                return Math.floor(generator.baseCost * Math.pow(1.15, generator.owned));
+            },
+            
+            // Calculate the current CPS of a generator
+            getGeneratorCps(generator) {
+                let cps = generator.baseCps * generator.owned;
+                
+                // Apply upgrades that affect this specific generator
+                this.upgrades.forEach(upgrade => {
+                    if (upgrade.purchased && (upgrade.generatorId === generator.id || upgrade.generatorId === -1)) {
+                        cps *= upgrade.multiplier;
+                    }
+                });
+                
+                // Apply prestige bonus
+                if (this.prestigePoints > 0) {
+                    cps *= 1 + (this.prestigePoints * 0.05);
+                }
+                
+                return cps;
+            },
+            
+            // Calculate total CPS
+            calculateCps() {
+                let total = 0;
+                this.generators.forEach(generator => {
+                    total += this.getGeneratorCps(generator);
+                });
+                this.cookiesPerSecond = total;
+                return total;
+            },
+            
+            // Buy a generator
+            buyGenerator(generatorId) {
+                const generator = this.generators.find(g => g.id === generatorId);
+                const cost = this.getGeneratorCost(generator);
+                
+                if (this.cookies >= cost) {
+                    this.cookies -= cost;
+                    generator.owned++;
+                    this.calculateCps();
+                    this.save();
+                    return true;
+                }
+                return false;
+            },
+            
+            // Buy an upgrade
+            buyUpgrade(upgradeId) {
+                const upgrade = this.upgrades.find(u => u.id === upgradeId);
+                
+                if (!upgrade.purchased && this.cookies >= upgrade.cost) {
+                    this.cookies -= upgrade.cost;
+                    upgrade.purchased = true;
+                    this.calculateCps();
+                    this.save();
+                    return true;
+                }
+                return false;
+            },
+            
+            // Prestige - reset the game for bonuses
+            prestige() {
+                // Calculate prestige points (1 point per 1 million cookies baked)
+                const points = Math.floor(this.totalCookies / 1000000);
+                
+                if (points > 0) {
+                    this.prestigePoints += points;
+                    
+                    // Reset game state
+                    this.cookies = 0;
+                    this.cookiesPerSecond = 0;
+                    this.generators.forEach(g => g.owned = 0);
+                    this.upgrades.forEach(u => u.purchased = false);
+                    
+                    this.save();
+                    return points;
+                }
+                return 0;
+            },
+            
+            // Save game to localStorage
+            save() {
+                const saveData = {
+                    cookies: this.cookies,
+                    totalCookies: this.totalCookies,
+                    prestigePoints: this.prestigePoints,
+                    generators: this.generators.map(g => g.owned),
+                    upgrades: this.upgrades.map(u => u.purchased),
+                    lastUpdate: Date.now()
+                };
+                localStorage.setItem('cookieGameSave', JSON.stringify(saveData));
+            },
+            
+            // Load game from localStorage
+            load() {
+                const saveData = JSON.parse(localStorage.getItem('cookieGameSave'));
+                if (saveData) {
+                    this.cookies = saveData.cookies || 0;
+                    this.totalCookies = saveData.totalCookies || 0;
+                    this.prestigePoints = saveData.prestigePoints || 0;
+                    this.lastUpdate = saveData.lastUpdate || Date.now();
+                    
+                    if (saveData.generators) {
+                        saveData.generators.forEach((owned, index) => {
+                            if (this.generators[index]) {
+                                this.generators[index].owned = owned;
+                            }
+                        });
+                    }
+                    
+                    if (saveData.upgrades) {
+                        saveData.upgrades.forEach((purchased, index) => {
+                            if (this.upgrades[index]) {
+                                this.upgrades[index].purchased = purchased;
+                            }
+                        });
+                    }
+                    
+                    this.calculateCps();
+                }
+            },
+            
+            // Update game state based on time passed
+            update() {
+                const now = Date.now();
+                const deltaTime = (now - this.lastUpdate) / 1000; // Convert to seconds
+                
+                if (deltaTime > 0) {
+                    this.cookies += this.cookiesPerSecond * deltaTime;
+                    this.totalCookies += this.cookiesPerSecond * deltaTime;
+                    this.lastUpdate = now;
+                }
+            }
+        };
+        
+        // UI functions
+        function updateUI() {
+            // Update cookie count
+            document.querySelector('.cookie-count').textContent = formatNumber(game.cookies) + ' cookies';
+            
+            // Update CPS display
+            document.querySelector('.cps-display').textContent = formatNumber(game.cookiesPerSecond) + ' cookies per second';
+            
+            // Update generators
+            const generatorsContainer = document.getElementById('generators');
+            generatorsContainer.innerHTML = '';
+            
+            game.generators.forEach(generator => {
+                const cost = game.getGeneratorCost(generator);
+                const cps = game.getGeneratorCps(generator);
+                
+                const generatorElement = document.createElement('div');
+                generatorElement.className = 'upgrade';
+                generatorElement.innerHTML = `
+                    <div class="upgrade-header">
+                        <span class="upgrade-name">${generator.name}</span>
+                        <span class="upgrade-level">${generator.owned}</span>
+                    </div>
+                    <div class="upgrade-description">${generator.description}</div>
+                    <div class="upgrade-footer">
+                        <span class="upgrade-cost">${formatNumber(cost)} cookies</span>
+                        <button class="buy-button" data-generator-id="${generator.id}" ${game.cookies < cost ? 'disabled' : ''}>
+                            Buy
+                        </button>
+                    </div>
+                    <div style="margin-top: 5px; font-size: 0.8rem;">Producing ${formatNumber(cps)}/s</div>
+                `;
+                generatorsContainer.appendChild(generatorElement);
+            });
+            
+            // Update upgrades
+            const upgradesContainer = document.getElementById('upgrades');
+            upgradesContainer.innerHTML = '';
+            
+            game.upgrades.forEach(upgrade => {
+                if (!upgrade.purchased) {
+                    const upgradeElement = document.createElement('div');
+                    upgradeElement.className = 'upgrade';
+                    upgradeElement.innerHTML = `
+                        <div class="upgrade-header">
+                            <span class="upgrade-name">${upgrade.name}</span>
+                        </div>
+                        <div class="upgrade-description">${upgrade.description}</div>
+                        <div class="upgrade-footer">
+                            <span class="upgrade-cost">${formatNumber(upgrade.cost)} cookies</span>
+                            <button class="buy-button" data-upgrade-id="${upgrade.id}" ${game.cookies < upgrade.cost ? 'disabled' : ''}>
+                                Buy
+                            </button>
+                        </div>
+                    `;
+                    upgradesContainer.appendChild(upgradeElement);
+                }
+            });
+            
+            // Update prestige button
+            const prestigeButton = document.getElementById('prestige');
+            const prestigeCookiesNeeded = 1000000 - (game.totalCookies % 1000000);
+            const nextPrestige = Math.floor(game.totalCookies / 1000000) + 1;
+            
+            if (game.totalCookies >= 1000000) {
+                prestigeButton.disabled = false;
+                prestigeButton.textContent = `Prestige (gain ${nextPrestige} point${nextPrestige > 1 ? 's' : ''})`;
+            } else {
+                prestigeButton.disabled = true;
+                prestigeButton.textContent = `Prestige (${formatNumber(prestigeCookiesNeeded)} more needed)`;
+            }
+            
+            document.getElementById('prestige-info').textContent = 
+                `You have ${game.prestigePoints} prestige point${game.prestigePoints !== 1 ? 's' : ''} (+${game.prestigePoints * 5}% bonus)`;
+        }
+        
+        // Format numbers for display
+        function formatNumber(num) {
+            if (num < 1000) return Math.floor(num);
+            if (num < 1000000) return (num / 1000).toFixed(1) + 'K';
+            if (num < 1000000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num < 1000000000000) return (num / 1000000000).toFixed(1) + 'B';
+            return (num / 1000000000000).toFixed(1) + 'T';
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Create click effect
+        function createClickEffect(x, y, value) {
+            const cookieDisplay = document.querySelector('.cookie-display');
+            const effect = document.createElement('div');
+            effect.className = 'click-effect';
+            effect.style.left = `${x - 15}px`;
+            effect.style.top = `${y - 15}px`;
+            effect.textContent = `+${formatNumber(value)}`;
+            effect.style.color = 'var(--accent)';
+            effect.style.fontWeight = 'bold';
+            effect.style.textAlign = 'center';
+            effect.style.lineHeight = '30px';
+            cookieDisplay.appendChild(effect);
+            
+            setTimeout(() => {
+                effect.remove();
+            }, 1000);
+        }
+        
+        // Create cookie particles
+        function createCookieParticles(count) {
+            const cookieButton = document.getElementById('cookie');
+            const rect = cookieButton.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'cookie-particle';
+                particle.style.left = `${centerX - 10}px`;
+                particle.style.top = `${centerY - 10}px`;
+                
+                // Random direction
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 50 + Math.random() * 50;
+                const targetX = centerX + Math.cos(angle) * distance;
+                const targetY = centerY + Math.sin(angle) * distance;
+                
+                // Random size
+                const size = 5 + Math.random() * 15;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random animation duration
+                const duration = 1 + Math.random() * 2;
+                particle.style.animationDuration = `${duration}s`;
+                
+                document.body.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, duration * 1000);
+            }
+        }
+        
+        // Initialize the game
+        function init() {
+            // Load saved game
+            game.load();
+            
+            // Update UI immediately
+            updateUI();
+            
+            // Set up game loop
+            setInterval(() => {
+                game.update();
+                updateUI();
+            }, 100);
+            
+            // Cookie click event
+            document.getElementById('cookie').addEventListener('click', (e) => {
+                let cookiesGained = 1;
+                
+                // Apply cookie clicker upgrade
+                if (game.upgrades[10].purchased) { // Cookie Clicker upgrade
+                    cookiesGained *= 2;
+                }
+                
+                // Apply prestige bonus
+                if (game.prestigePoints > 0) {
+                    cookiesGained *= 1 + (game.prestigePoints * 0.05);
+                }
+                
+                game.cookies += cookiesGained;
+                game.totalCookies += cookiesGained;
+                
+                // Create click effect
+                createClickEffect(e.clientX, e.clientY, cookiesGained);
+                
+                // Create cookie particles occasionally
+                if (Math.random() < 0.3) {
+                    createCookieParticles(3);
+                }
+                
+                game.save();
+                updateUI();
+            });
+            
+            // Generator buy events (delegated)
+            document.getElementById('generators').addEventListener('click', (e) => {
+                if (e.target.classList.contains('buy-button')) {
+                    const generatorId = parseInt(e.target.getAttribute('data-generator-id'));
+                    if (game.buyGenerator(generatorId)) {
+                        showNotification(`Purchased ${game.generators.find(g => g.id === generatorId).name}!`);
+                        createCookieParticles(5);
+                    }
+                }
+            });
+            
+            // Upgrade buy events (delegated)
+            document.getElementById('upgrades').addEventListener('click', (e) => {
+                if (e.target.classList.contains('buy-button')) {
+                    const upgradeId = parseInt(e.target.getAttribute('data-upgrade-id'));
+                    if (game.buyUpgrade(upgradeId)) {
+                        const upgrade = game.upgrades.find(u => u.id === upgradeId);
+                        showNotification(`Purchased ${upgrade.name}!`);
+                        createCookieParticles(10);
+                    }
+                }
+            });
+            
+            // Prestige event
+            document.getElementById('prestige').addEventListener('click', () => {
+                const pointsGained = game.prestige();
+                if (pointsGained > 0) {
+                    showNotification(`Prestiged! Gained ${pointsGained} point${pointsGained > 1 ? 's' : ''}!`);
+                    createCookieParticles(20);
+                }
+            });
+            
+            // Handle offline progress
+            const offlineTime = (Date.now() - game.lastUpdate) / 1000;
+            if (offlineTime > 5) { // Only show if offline for more than 5 seconds
+                const offlineCookies = game.cookiesPerSecond * Math.min(offlineTime, 86400); // Cap at 1 day
+                if (offlineCookies > 0) {
+                    showNotification(`Welcome back! You earned ${formatNumber(offlineCookies)} cookies while away!`);
+                }
+            }
+        }
+        
+        // Start the game when the page loads
+        window.addEventListener('load', init);
+    </script>
+        <audio id="background-music" src="assets/sound/background.mp3" loop autoplay></audio>
+        <script src="script.js"></script>
+        <script>
+            window.onload = function() {
+                const backgroundMusic = document.getElementById('background-music');
+                backgroundMusic.volume = 0.2; // Set volume to 20% (0.2)
+
+                // Attempt to play immediately (for browsers that allow autoplay)
+                backgroundMusic.play().catch(error => {
+                    console.log('Autoplay prevented:', error);
+                    // If autoplay is prevented, play on user interaction
+                    const cookieButton = document.getElementById('cookie');
+                    if (cookieButton) {
+                        cookieButton.addEventListener('click', () => {
+                            backgroundMusic.play().catch(err => {
+                                console.error('Failed to play music on click:', err);
+                            });
+                        }, { once: true }); // Play only once on first click
+                    }
+                });
+            };
+        </script>
+    </body>
+</html>
